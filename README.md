@@ -59,3 +59,14 @@ This is used for finding non-busy days. It takes lookAheadDays as a param. But n
 
 - when can I reconnect with my longer term clients?
 - when should I do my follow-ups?
+
+## How to run this code?
+Prerequisites:
+- [Deno](https://deno.com/)
+
+1. Git clone this repo
+2. `cd` into this repo
+3. run `deno task dev` in the terminal
+
+You should see a chat interface show up ready to take input.
+You can test it out by running commands like "show me my calendar".
