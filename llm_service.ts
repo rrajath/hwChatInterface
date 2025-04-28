@@ -4,12 +4,17 @@ import { ApiClient } from './api_client.ts';
 export class LlmService {
   private openai: OpenAI;
   private apiClient: ApiClient;
+  private conversationHistory: Array<
+    | { role: 'user' | 'assistant'; content: string }
+    | { role: 'function'; name: string; content: string }
+  >;
 
   constructor(apiKey: string, apiClient: ApiClient) {
     this.openai = new OpenAI({
       apiKey: apiKey,
     });
     this.apiClient = apiClient;
+    this.conversationHistory = [];
   }
 
   async processMessage(
@@ -89,21 +94,23 @@ export class LlmService {
         description:
           'Find optimal days for reconnecting with clients or doing work',
         parameters: {
-          type: 'object',
-          properties: {
-            startDate: {
-              type: 'string',
-              description: 'ISO 8601 format start date',
-            },
-            endDate: {
-              type: 'string',
-              description: 'ISO 8601 format end date',
-            },
-          },
-          required: ['startDate', 'endDate'],
+          //   type: 'object',
+          //   properties: {
+          //     startDate: {
+          //       type: 'string',
+          //       description: 'ISO 8601 format start date',
+          //     },
+          //     endDate: {
+          //       type: 'string',
+          //       description: 'ISO 8601 format end date',
+          //     },
+          //   },
+          //   required: ['startDate', 'endDate'],
         },
       },
     ];
+
+    this.conversationHistory.push({ role: 'user', content: message });
 
     try {
       const response = await this.openai.chat.completions.create({
@@ -116,6 +123,7 @@ export class LlmService {
               You can call functions to get appointments, book appointments, find availability, and find optimal days for reconnecting with clients. \
               You can also ask the user for more information if needed. \
               If clientId and agentId are not provided, use the default values of 1 for each. \
+
               While booking an appointment, \
               - if the end time is not provided, ask how long the appointment is for. \
               - if the title is not provided, make sure to ask for the title of the appointment. \
@@ -139,14 +147,15 @@ export class LlmService {
                 time range: 2025-05-05T00:00:00|2025-05-11T23:59:59
                 event type: call
 
-              While finding optimal days, \
+              While finding optimal days, if you get a list of dates as a response,
+              return those dates in natural language while maintaining the order in which they were returned.
               Example inputs:
               - when should I reconnect with my longer term clients? \
               - when should I do my work? \
               - when should I do my follow ups? \
               `,
           },
-          { role: 'user', content: message },
+          ...this.conversationHistory,
         ],
         functions,
         function_call: 'auto',
@@ -195,8 +204,6 @@ export class LlmService {
             functionResponse = await this.apiClient.findOptimalDays({
               agentId,
               clientId,
-              startDate: functionArgs.startDate,
-              endDate: functionArgs.endDate,
             });
             break;
         }

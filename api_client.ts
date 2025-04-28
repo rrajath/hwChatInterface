@@ -42,7 +42,8 @@ export class ApiClient {
     appointment: Appointment
   ): Promise<ApiResponse<Appointment>> {
     try {
-      const url = `${this.baseUrl}/api/appointments`;
+      const url = `${this.baseUrl}/api/appointments/book`;
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -85,7 +86,6 @@ export class ApiClient {
     request: OptimalDayRequest
   ): Promise<ApiResponse<string[]>> {
     const url = `${this.baseUrl}/api/availability/optimal-days?agentId=${request.agentId}&clientId=${request.clientId}`;
-    console.log('🚀 ~ ApiClient ~ url:', url);
     try {
       const response = await fetch(url, {
         method: 'GET',

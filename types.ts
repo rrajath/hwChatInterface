@@ -19,8 +19,6 @@ export interface AvailabilityRequest {
 export interface OptimalDayRequest {
   agentId: string;
   clientId: string;
-  startDate: string;
-  endDate: string;
 }
 
 export interface ApiResponse<T> {

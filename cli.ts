@@ -1,7 +1,6 @@
-import { parse, readLines, colors } from './deps.ts';
+import { config, parse, readLines, colors } from './deps.ts';
 import { ApiClient } from './api_client.ts';
 import { LlmService } from './llm_service.ts';
-import { config } from 'https://deno.land/x/dotenv@v3.2.2/mod.ts';
 
 const args = parse(Deno.args, {
   string: ['agent', 'client', 'api-key', 'server'],
